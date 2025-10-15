@@ -1,0 +1,21 @@
+# Ignore build and dependency directories
+node_modules
+dist
+
+# Ignore environment files
+.env
+
+# Ignore lock files
+package-lock.json
+yarn.lock
+pnpm.lock
+
+# Ignore test coverage output
+coverage
+
+# Ignore config files for other tools
+*.config.js
+*.config.cjs
+
+# Ignore specific file patterns
+src/**/*.test.ts
