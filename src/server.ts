@@ -1,16 +1,14 @@
 import express from 'express';
-import morgan from 'morgan';
-import { exampleMiddleware } from './middleware/exampleMiddleware';
+import { validateToken } from './middleware/auth';
 import { exampleRouter } from './routes/exampleRouter';
+import { requestLogger } from './middleware/requestLogger';
 
 export const createServer = () => {
   const app = express();
 
   app.use(express.json());
-  app.use(morgan('dev'));
-
-  app.use(exampleMiddleware);
-  app.use('/example', exampleRouter());
+  app.use(requestLogger);
+  app.use('/example', validateToken, exampleRouter());
 
   return app;
 };
