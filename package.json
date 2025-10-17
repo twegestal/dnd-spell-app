@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "test": "vitest --run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "codegen": "graphql-codegen"
   },
   "keywords": [],
   "author": "",
@@ -22,11 +23,17 @@
     "@types/morgan": "^1.9.9",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "graphql": "^16.11.0",
+    "graphql-request": "^7.3.0",
     "morgan": "^1.10.0",
     "winston": "^3.18.3",
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^6.0.0",
+    "@graphql-codegen/typed-document-node": "^6.0.2",
+    "@graphql-codegen/typescript": "^5.0.2",
+    "@graphql-codegen/typescript-operations": "^5.0.2",
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.2",
     "@typescript-eslint/eslint-plugin": "^8.18.2",
