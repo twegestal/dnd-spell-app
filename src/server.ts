@@ -1,6 +1,6 @@
 import express from 'express';
 import { validateToken } from './middleware/auth';
-import { exampleRouter } from './routes/exampleRouter';
+import { spellRouter } from './routes/spellRouter';
 import { requestLogger } from './middleware/requestLogger';
 
 export const createServer = () => {
@@ -8,7 +8,7 @@ export const createServer = () => {
 
   app.use(express.json());
   app.use(requestLogger);
-  app.use('/example', validateToken, exampleRouter());
+  app.use('/spells', spellRouter());
 
   return app;
 };
