@@ -6,6 +6,8 @@ import { requestLogger } from './middleware/requestLogger.js';
 import { spellFilterRouter } from './routes/spellFilterRouter.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { healthRouter } from './routes/healthRouter.js';
+import { metaRouter } from './routes/metaRouter.js';
+import { characterRouter } from './routes/characterRouter.js';
 
 export const createServer = () => {
   const app = express();
@@ -14,8 +16,10 @@ export const createServer = () => {
   app.use(express.json());
   app.use(requestLogger);
   app.use('/health', healthRouter());
+  app.use('/api/meta', validateToken, metaRouter());
   app.use('/api/spells', validateToken, spellRouter());
   app.use('/api/spells/filter', validateToken, spellFilterRouter());
+  app.use('/api/characters', validateToken, characterRouter());
   app.use(errorHandler);
 
   return app;
