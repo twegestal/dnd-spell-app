@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import * as spellService from '../service/spellService';
 import { SpellIndexParamSchema } from '../schemas';
-import { SpellFilterRequestSchema } from '../schemas/spellFilterRequest';
-import { fetchSpellsFiltered } from '../service/spellFilterService';
+import { SpellFilterRequestSchema } from '../schemas/spellFilterRequest.js';
+import { fetchSpellsFiltered } from '../service/spellFilterService.js';
 
 export const spellRouter = () => {
   const router = Router();

@@ -1,11 +1,11 @@
 import express from 'express';
 import cors from 'cors';
-import { validateToken } from './middleware/auth';
-import { spellRouter } from './routes/spellRouter';
-import { requestLogger } from './middleware/requestLogger';
-import { spellFilterRouter } from './routes/spellFilterRouter';
-import { errorHandler } from './middleware/errorHandler';
-import { healthRouter } from './routes/healthRouter';
+import { validateToken } from './middleware/auth.js';
+import { spellRouter } from './routes/spellRouter.js';
+import { requestLogger } from './middleware/requestLogger.js';
+import { spellFilterRouter } from './routes/spellFilterRouter.js';
+import { errorHandler } from './middleware/errorHandler.js';
+import { healthRouter } from './routes/healthRouter.js';
 
 export const createServer = () => {
   const app = express();

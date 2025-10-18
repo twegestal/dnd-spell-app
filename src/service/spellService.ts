@@ -1,8 +1,8 @@
 import {
   SpellListResponseSchema,
   SpellDetailSchema,
-} from '../schemas/spellSchemas';
-import type { SpellListResponse, SpellDetail } from '../types/spells';
+} from '../schemas/spellSchemas.js';
+import type { SpellListResponse, SpellDetail } from '../types/spells.js';
 import { logger } from '../log';
 
 const BASE_URL = 'https://www.dnd5eapi.co/api/spells';

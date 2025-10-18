@@ -4,7 +4,7 @@ import {
   SpellListResponseSchema,
   SpellDetailSchema,
 } from '../schemas/spellSchemas';
-import { SpellFilterRequestSchema } from '../schemas/spellFilterRequest';
+import { SpellFilterRequestSchema } from '../schemas/spellFilterRequest.js';
 
 export type SpellSummary = z.infer<typeof SpellSummarySchema>;
 export type SpellListResponse = z.infer<typeof SpellListResponseSchema>;

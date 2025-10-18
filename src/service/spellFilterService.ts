@@ -1,5 +1,5 @@
 import { logger } from '../log';
-import { gqlRequest } from '../lib/graphqlClient';
+import { gqlRequest } from '../lib/graphqlClient.js';
 import {
   SpellsFilteredDocument,
   type SpellsFilteredQuery,

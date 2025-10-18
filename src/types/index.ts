@@ -1,2 +1,2 @@
-export * from './exampleTypes';
-export * from './error';
+export * from './exampleTypes.js';
+export * from './error.js';

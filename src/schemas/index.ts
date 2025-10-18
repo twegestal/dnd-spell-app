@@ -1,1 +1,1 @@
-export * from './spellSchemas';
+export * from './spellSchemas.js';
