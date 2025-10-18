@@ -14,8 +14,8 @@ export const createServer = () => {
   app.use(express.json());
   app.use(requestLogger);
   app.use('/health', healthRouter());
-  app.use('/spells', validateToken, spellRouter());
-  app.use('/spells/filter', validateToken, spellFilterRouter());
+  app.use('api/spells', validateToken, spellRouter());
+  app.use('api/spells/filter', validateToken, spellFilterRouter());
   app.use(errorHandler);
 
   return app;
