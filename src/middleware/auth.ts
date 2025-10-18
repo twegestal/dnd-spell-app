@@ -1,6 +1,6 @@
 import type { RequestHandler } from 'express';
-import { supabase } from '../database';
-import { logger } from '../log';
+import { supabase } from '../database/index.js';
+import { logger } from '../log/index.js';
 
 export const validateToken: RequestHandler = async (req, res, next) => {
   try {

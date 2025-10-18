@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../log';
-import { ErrorResponse } from '../types';
+import { logger } from '../log/index.js';
+import { ErrorResponse } from '../types/error.js';
 
 interface ErrorProps extends Error {
   status?: number;

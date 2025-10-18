@@ -1,11 +1,11 @@
-import { logger } from '../log';
+import { logger } from '../log/index.js';
 import { gqlRequest } from '../lib/graphqlClient.js';
 import {
   SpellsFilteredDocument,
   type SpellsFilteredQuery,
   type SpellsFilteredQueryVariables,
-} from '../graphql/__generated__/types';
-import type { SpellFilterRequest } from '../types/spells';
+} from '../graphql/__generated__/types.js';
+import type { SpellFilterRequest } from '../types/spells.js';
 
 function toArray<T>(v: T | T[] | undefined): T[] | undefined {
   if (v === undefined) return undefined;

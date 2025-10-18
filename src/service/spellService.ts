@@ -3,7 +3,7 @@ import {
   SpellDetailSchema,
 } from '../schemas/spellSchemas.js';
 import type { SpellListResponse, SpellDetail } from '../types/spells.js';
-import { logger } from '../log';
+import { logger } from '../log/index.js';
 
 const BASE_URL = 'https://www.dnd5eapi.co/api/spells';
 

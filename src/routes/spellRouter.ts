@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import * as spellService from '../service/spellService';
-import { SpellIndexParamSchema } from '../schemas';
+import * as spellService from '../service/spellService.js';
+import { SpellIndexParamSchema } from '../schemas/spellSchemas.js';
 import { SpellFilterRequestSchema } from '../schemas/spellFilterRequest.js';
 import { fetchSpellsFiltered } from '../service/spellFilterService.js';
 

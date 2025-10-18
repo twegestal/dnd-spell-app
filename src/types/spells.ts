@@ -3,7 +3,7 @@ import {
   SpellSummarySchema,
   SpellListResponseSchema,
   SpellDetailSchema,
-} from '../schemas/spellSchemas';
+} from '../schemas/spellSchemas.js';
 import { SpellFilterRequestSchema } from '../schemas/spellFilterRequest.js';
 
 export type SpellSummary = z.infer<typeof SpellSummarySchema>;

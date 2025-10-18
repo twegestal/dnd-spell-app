@@ -2,7 +2,7 @@
 import { GraphQLClient } from 'graphql-request';
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { print, Kind, type DefinitionNode } from 'graphql';
-import { logger } from '../log';
+import { logger } from '../log/index.js';
 
 const ENDPOINT = 'https://www.dnd5eapi.co/graphql';
 
