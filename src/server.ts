@@ -15,9 +15,9 @@ export const createServer = () => {
   app.use(express.json());
   app.use(requestLogger);
   app.use('/health', healthRouter());
-  app.use('/api/meta', metaRouter());
-  app.use('/api/spells', spellRouter());
-  app.use('/api/characters', characterRouter());
+  app.use('/api/meta', validateToken, metaRouter());
+  app.use('/api/spells', validateToken, spellRouter());
+  app.use('/api/characters', validateToken, characterRouter());
   app.use(errorHandler);
 
   return app;

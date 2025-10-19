@@ -3,3 +3,5 @@ export type ErrorResponse = {
   status?: number;
   stack?: string;
 };
+
+export type SbError = { code?: string; message?: string } | null | undefined;

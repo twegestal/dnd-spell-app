@@ -44,7 +44,7 @@ export const SpellSchema = z.object({
     })
     .optional(),
   heal_at_slot_level: z.record(z.string(), z.string()).optional(),
-  url: z.string(), // '/api/2014/spells/...'
+  url: z.string(),
 });
 
 export const SpellListResponseSchema = z.object({

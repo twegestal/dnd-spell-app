@@ -1,5 +1,16 @@
 import { z } from 'zod';
 
+export type CharacterWithJoins = {
+  id: string;
+  user_id: string;
+  name: string;
+  level: number;
+  created_at: string;
+  updated_at: string;
+  character_races?: { name: string }[] | null;
+  character_classes?: { name: string }[] | null;
+};
+
 export type CharacterRow = {
   id: string;
   user_id: string;
