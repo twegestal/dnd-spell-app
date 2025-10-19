@@ -1,65 +1,26 @@
-import {
-  SpellListResponseSchema,
-  SpellDetailSchema,
-} from '../schemas/spellSchemas.js';
-import type { SpellListResponse, SpellDetail } from '../types/spells.js';
+import { supabaseAdmin } from '../database/index.js';
 import { logger } from '../log/index.js';
+import { SpellListResponse, SpellListResponseSchema } from '../types/spells.js';
 
-const BASE_URL = 'https://www.dnd5eapi.co/api/spells';
+export const fetchAllSpells = async (): Promise<SpellListResponse> => {
+  logger.info('Fetching all spells from database');
 
-function assertOk(res: Response, context: string) {
-  if (!res.ok) {
-    logger.error(`${context} failed`, {
-      status: res.status,
-      statusText: res.statusText,
-    });
-    throw new Error(`${context} failed: ${res.status} ${res.statusText}`);
-  }
-}
+  const { data, error } = await supabaseAdmin
+    .from('spells')
+    .select('raw')
+    .order('name', { ascending: true });
 
-export async function fetchAllSpells(): Promise<SpellListResponse> {
-  logger.info('Fetching all spells from external API');
-
-  const res = await fetch(BASE_URL);
-  assertOk(res, 'Fetch all spells');
-
-  const json = await res.json();
-  const parsed = SpellListResponseSchema.safeParse(json);
-
-  if (!parsed.success) {
-    logger.error('SpellListResponse validation error', {
-      issues: parsed.error.format(),
-    });
-    throw new Error('Invalid spell list response shape');
+  if (error) {
+    logger.error('Failed to fetch spells', { message: error.message });
+    throw error;
   }
 
-  logger.info('Fetched and validated spell list successfully', {
-    count: parsed.data.count,
+  const spells = (data ?? []).map((r: any) => r.raw);
+
+  const parsed = SpellListResponseSchema.parse({
+    count: spells.length,
+    results: spells,
   });
 
-  return parsed.data;
-}
-
-export async function fetchSpellByIndex(index: string): Promise<SpellDetail> {
-  logger.info('Fetching spell details', { index });
-
-  const res = await fetch(`${BASE_URL}/${encodeURIComponent(index)}`);
-  assertOk(res, `Fetch spell "${index}"`);
-
-  const json = await res.json();
-  const parsed = SpellDetailSchema.safeParse(json);
-
-  if (!parsed.success) {
-    logger.error('SpellDetail validation error', {
-      index,
-      issues: parsed.error.format(),
-    });
-    throw new Error(`Invalid spell detail response shape for index "${index}"`);
-  }
-
-  logger.info('Fetched and validated spell successfully', {
-    index,
-    name: parsed.data.name,
-  });
-  return parsed.data;
-}
+  return parsed;
+};

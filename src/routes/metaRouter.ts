@@ -4,7 +4,7 @@ import { fetchClasses, fetchRaces } from '../service/metaService.js';
 export const metaRouter = () => {
   const router = Router();
 
-  router.get('/races', async (req, res, next) => {
+  router.get('/races', async (_req, res, next) => {
     try {
       const data = await fetchRaces();
       res.status(200).json(data);
@@ -13,7 +13,7 @@ export const metaRouter = () => {
     }
   });
 
-  router.get('/classes', async (req, res, next) => {
+  router.get('/classes', async (_req, res, next) => {
     try {
       const data = await fetchClasses();
       res.status(200).json(data);

@@ -3,7 +3,7 @@ import {
   createCharacterForUser,
   listCharactersByUser,
 } from '../service/characterService.js';
-import { CharacterCreationSchema } from '../schemas/characterCreation.js';
+import { CharacterCreationSchema } from '../types/character.js';
 import { logger } from '../log/index.js';
 
 export const characterRouter = () => {

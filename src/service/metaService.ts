@@ -1,66 +1,36 @@
-// services/metaService.ts
-import { MetaListResponseSchema } from '../schemas/metaSchemas.js';
-import type { MetaListResponse } from '../types/meta.js';
+import { MetaListResponse, MetaListResponseSchema } from '../types/meta.js';
 import { logger } from '../log/index.js';
+import { supabaseAdmin } from '../database/index.js';
 
-const API_BASE = 'https://www.dnd5eapi.co/api';
-
-function assertOk(res: Response, context: string) {
-  if (!res.ok) {
-    logger.error(`${context} failed`, {
-      status: res.status,
-      statusText: res.statusText,
-    });
-    throw new Error(`${context} failed: ${res.status} ${res.statusText}`);
-  }
-}
-
-/**
- * Tiny in-memory cache (per-process). Good enough for dev/single instance.
- * For multi-instance, swap to Redis later.
- */
-const cache = new Map<string, { data: MetaListResponse; expiresAt: number }>();
-const DEFAULT_TTL_MS = 24 * 60 * 60 * 1000;
-
-async function fetchMetaList(
-  kind: 'races' | 'classes',
-  { ttlMs = DEFAULT_TTL_MS }: { ttlMs?: number } = {},
+async function fetchMeta(
+  table: 'character_races' | 'character_classes',
 ): Promise<MetaListResponse> {
-  const cacheKey = `meta:${kind}`;
-  const now = Date.now();
-  const cached = cache.get(cacheKey);
-  if (cached && cached.expiresAt > now) {
-    logger.debug(`meta ${kind}: served from cache`);
-    return cached.data;
+  logger.info(`Fetching ${table} from database`);
+  const { data, error } = await supabaseAdmin
+    .from(table)
+    .select('id, name')
+    .order('name', { ascending: true });
+
+  if (error) {
+    logger.error(`Failed to fetch ${table}`, { message: error.message });
+    throw error;
   }
 
-  logger.info(`Fetching ${kind} from external API`);
-  const res = await fetch(`${API_BASE}/${kind}`, {});
-  assertOk(res, `Fetch ${kind}`);
+  const results = (data ?? []).map((row: any) => ({
+    id: String(row.id),
+    name: row.name as string,
+  }));
 
-  const json = await res.json();
-  const parsed = MetaListResponseSchema.safeParse(json);
-
-  if (!parsed.success) {
-    logger.error(`Meta ${kind} validation error`, {
-      issues: parsed.error.format(),
-    });
-    throw new Error(`Invalid ${kind} response shape`);
-  }
-
-  const data = parsed.data;
-  cache.set(cacheKey, { data, expiresAt: now + ttlMs });
-
-  logger.info(`Fetched and validated ${kind} successfully`, {
-    count: data.count,
+  return MetaListResponseSchema.parse({
+    count: results.length,
+    results,
   });
-  return data;
 }
 
 export async function fetchRaces(): Promise<MetaListResponse> {
-  return fetchMetaList('races');
+  return fetchMeta('character_races');
 }
 
 export async function fetchClasses(): Promise<MetaListResponse> {
-  return fetchMetaList('classes');
+  return fetchMeta('character_classes');
 }
