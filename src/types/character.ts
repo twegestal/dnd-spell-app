@@ -29,4 +29,9 @@ export const CharacterCreationSchema = z.object({
   level: z.number().int().min(1).max(20),
 });
 
+export const AssignKnownSpellSchema = z.object({
+  spellId: z.string().min(1),
+});
+
+export type AssignKnownSpell = z.infer<typeof AssignKnownSpellSchema>;
 export type CharacterCreation = z.infer<typeof CharacterCreationSchema>;

@@ -5,7 +5,24 @@ import {
   sbThrow,
 } from '../util/supabaseHelpers.js';
 
-export async function addKnownSpell(characterId: string, spellId: string) {
+async function getSpellUuidByIndex(spellIndex: string): Promise<string> {
+  const { data, error } = await supabaseAdmin
+    .from('spells')
+    .select('id')
+    .eq('idx', spellIndex)
+    .single();
+
+  if (error || !data?.id) {
+    const err: any = new Error(`Spell not found for index "${spellIndex}"`);
+    err.status = 404;
+    throw err;
+  }
+  return data.id as string;
+}
+
+export async function addKnownSpell(characterId: string, spellIndex: string) {
+  const spellId = await getSpellUuidByIndex(spellIndex);
+
   const { data, error } = await supabaseAdmin
     .from('character_known_spells')
     .upsert(
@@ -25,7 +42,12 @@ export async function addKnownSpell(characterId: string, spellId: string) {
   return sbAssert(data, error, 'addKnownSpell');
 }
 
-export async function removeKnownSpell(characterId: string, spellId: string) {
+export async function removeKnownSpell(
+  characterId: string,
+  spellIndex: string,
+) {
+  const spellId = getSpellUuidByIndex(spellIndex);
+  
   const { error } = await supabaseAdmin
     .from('character_known_spells')
     .delete()
