@@ -1,3 +1,4 @@
+// src/routes/characterRouter.ts
 import { RequestHandler, Router } from 'express';
 import {
   createCharacterForUser,
@@ -7,10 +8,13 @@ import {
   AssignKnownSpellSchema,
   CharacterCreationSchema,
 } from '../types/character.js';
-import { logger } from '../log/index.js';
 import {
   addKnownSpell,
   removeKnownSpell,
+  listKnownSpells,
+  listPreparedSpells,
+  addPreparedSpell,
+  removePreparedSpell,
 } from '../service/characterSpellService.js';
 
 export const characterRouter = () => {
@@ -18,7 +22,6 @@ export const characterRouter = () => {
 
   const list: RequestHandler = async (req, res, next) => {
     try {
-      logger.info(`user id is: ${req.user.id}`);
       const results = await listCharactersByUser(req.user.id);
       res.json({ results });
       return;
@@ -50,7 +53,6 @@ export const characterRouter = () => {
     try {
       const { id: characterId } = req.params;
       const { spellId } = AssignKnownSpellSchema.parse(req.body);
-
       const created = await addKnownSpell(characterId, spellId);
       res.status(201).json(created);
       return;
@@ -66,8 +68,56 @@ export const characterRouter = () => {
   const removeKnown: RequestHandler = async (req, res, next) => {
     try {
       const { id: characterId, spellId } = req.params;
-
       const result = await removeKnownSpell(characterId, spellId);
+      res.json(result);
+      return;
+    } catch (e) {
+      next(e);
+    }
+  };
+
+  const listKnown: RequestHandler = async (req, res, next) => {
+    try {
+      const { id: characterId } = req.params;
+      const results = await listKnownSpells(characterId);
+      res.json({ results });
+      return;
+    } catch (e) {
+      next(e);
+    }
+  };
+
+  const listPrepared: RequestHandler = async (req, res, next) => {
+    try {
+      const { id: characterId } = req.params;
+      const results = await listPreparedSpells(characterId);
+      res.json({ results });
+      return;
+    } catch (e) {
+      next(e);
+    }
+  };
+
+  const addPrepared: RequestHandler = async (req, res, next) => {
+    try {
+      const { id: characterId } = req.params;
+      const { spellId } = AssignKnownSpellSchema.parse(req.body);
+      const created = await addPreparedSpell(characterId, spellId);
+      res.status(201).json(created);
+      return;
+    } catch (e: any) {
+      if (e?.name === 'ZodError') {
+        res.status(400).json({ message: 'Invalid payload', issues: e.errors });
+        return;
+      }
+      next(e);
+    }
+  };
+
+  const removePrepared: RequestHandler = async (req, res, next) => {
+    try {
+      const { id: characterId, spellId } = req.params;
+      const result = await removePreparedSpell(characterId, spellId);
       res.json(result);
       return;
     } catch (e) {
@@ -77,7 +127,15 @@ export const characterRouter = () => {
 
   router.get('/', list);
   router.post('/', create);
+
+  router.get('/:id/known-spells', listKnown);
+  router.get('/:id/prepared-spells', listPrepared);
+
   router.post('/:id/known-spells', addKnown);
   router.delete('/:id/known-spells/:spellId', removeKnown);
+
+  router.post('/:id/prepared-spells', addPrepared);
+  router.delete('/:id/prepared-spells/:spellId', removePrepared);
+
   return router;
 };

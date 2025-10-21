@@ -46,8 +46,8 @@ export async function removeKnownSpell(
   characterId: string,
   spellIndex: string,
 ) {
-  const spellId = getSpellUuidByIndex(spellIndex);
-  
+  const spellId = await getSpellUuidByIndex(spellIndex);
+
   const { error } = await supabaseAdmin
     .from('character_known_spells')
     .delete()
@@ -58,7 +58,34 @@ export async function removeKnownSpell(
   return { ok: true as const };
 }
 
-export async function addPreparedSpell(characterId: string, spellId: string) {
+export async function listKnownSpells(characterId: string) {
+  const { data: rows, error: e1 } = await supabaseAdmin
+    .from('character_known_spells')
+    .select('spell_id')
+    .eq('character_id', characterId);
+
+  if (e1) sbThrow(e1, 'listKnownSpells.ids');
+
+  const ids = (rows ?? []).map((r: any) => r.spell_id);
+  if (ids.length === 0) return [];
+
+  const { data: spells, error: e2 } = await supabaseAdmin
+    .from('spells')
+    .select('raw')
+    .in('id', ids)
+    .order('name', { ascending: true });
+
+  if (e2) sbThrow(e2, 'listKnownSpells.spells');
+
+  return (spells ?? []).map((r: any) => r.raw);
+}
+
+export async function addPreparedSpell(
+  characterId: string,
+  spellIndex: string,
+) {
+  const spellId = await getSpellUuidByIndex(spellIndex);
+
   const { data, error } = await supabaseAdmin
     .from('character_prepared_spells')
     .upsert(
@@ -80,8 +107,10 @@ export async function addPreparedSpell(characterId: string, spellId: string) {
 
 export async function removePreparedSpell(
   characterId: string,
-  spellId: string,
+  spellIndex: string,
 ) {
+  const spellId = await getSpellUuidByIndex(spellIndex);
+
   const { error } = await supabaseAdmin
     .from('character_prepared_spells')
     .delete()
@@ -90,4 +119,26 @@ export async function removePreparedSpell(
 
   if (error) sbThrow(error, 'removePreparedSpell');
   return { ok: true as const };
+}
+
+export async function listPreparedSpells(characterId: string) {
+  const { data: rows, error: e1 } = await supabaseAdmin
+    .from('character_prepared_spells')
+    .select('spell_id')
+    .eq('character_id', characterId);
+
+  if (e1) sbThrow(e1, 'listPreparedSpells.ids');
+
+  const ids = (rows ?? []).map((r: any) => r.spell_id);
+  if (ids.length === 0) return [];
+
+  const { data: spells, error: e2 } = await supabaseAdmin
+    .from('spells')
+    .select('raw')
+    .in('id', ids)
+    .order('name', { ascending: true });
+
+  if (e2) sbThrow(e2, 'listPreparedSpells.spells');
+
+  return (spells ?? []).map((r: any) => r.raw);
 }
