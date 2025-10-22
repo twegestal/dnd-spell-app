@@ -1,4 +1,3 @@
-// src/routes/characterRouter.ts
 import { RequestHandler, Router } from 'express';
 import {
   createCharacterForUser,

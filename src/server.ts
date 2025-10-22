@@ -7,6 +7,7 @@ import { errorHandler } from './middleware/errorHandler.js';
 import { healthRouter } from './routes/healthRouter.js';
 import { metaRouter } from './routes/metaRouter.js';
 import { characterRouter } from './routes/characterRouter.js';
+import { slotRouter } from './routes/slotRouter.js';
 
 export const createServer = () => {
   const app = express();
@@ -18,6 +19,7 @@ export const createServer = () => {
   app.use('/api/meta', validateToken, metaRouter());
   app.use('/api/spells', validateToken, spellRouter());
   app.use('/api/characters', validateToken, characterRouter());
+  app.use('/api/slots', validateToken, slotRouter());
   app.use(errorHandler);
 
   return app;
