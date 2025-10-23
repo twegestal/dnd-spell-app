@@ -1,13 +1,14 @@
+import { z } from 'zod';
 import { supabaseAdmin } from '../database/index.js';
 import { logger } from '../log/index.js';
-import { SpellListResponse, SpellListResponseSchema } from '../types/spells.js';
+import { SpellSchema, SpellListResponseSchema } from '../types/spells.js';
 
-export const fetchAllSpells = async (): Promise<SpellListResponse> => {
+export const fetchAllSpells = async () => {
   logger.info('Fetching all spells from database');
 
   const { data, error } = await supabaseAdmin
-    .from('spells')
-    .select('raw')
+    .from('spell_full')
+    .select('*')
     .order('name', { ascending: true });
 
   if (error) {
@@ -15,12 +16,8 @@ export const fetchAllSpells = async (): Promise<SpellListResponse> => {
     throw error;
   }
 
-  const spells = (data ?? []).map((r: any) => r.raw);
+  const spells = z.array(SpellSchema).parse(data ?? []);
 
-  const parsed = SpellListResponseSchema.parse({
-    count: spells.length,
-    results: spells,
-  });
-
+  const parsed = SpellListResponseSchema.parse({ results: spells });
   return parsed;
 };

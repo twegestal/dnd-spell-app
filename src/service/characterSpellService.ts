@@ -5,24 +5,7 @@ import {
   sbThrow,
 } from '../util/supabaseHelpers.js';
 
-async function getSpellUuidByIndex(spellIndex: string): Promise<string> {
-  const { data, error } = await supabaseAdmin
-    .from('spells')
-    .select('id')
-    .eq('idx', spellIndex)
-    .single();
-
-  if (error || !data?.id) {
-    const err: any = new Error(`Spell not found for index "${spellIndex}"`);
-    err.status = 404;
-    throw err;
-  }
-  return data.id as string;
-}
-
-export async function addKnownSpell(characterId: string, spellIndex: string) {
-  const spellId = await getSpellUuidByIndex(spellIndex);
-
+export async function addKnownSpell(characterId: string, spellId: string) {
   const { data, error } = await supabaseAdmin
     .from('character_known_spells')
     .upsert(
@@ -39,15 +22,11 @@ export async function addKnownSpell(characterId: string, spellIndex: string) {
       added_at: new Date().toISOString(),
     };
   }
+
   return sbAssert(data, error, 'addKnownSpell');
 }
 
-export async function removeKnownSpell(
-  characterId: string,
-  spellIndex: string,
-) {
-  const spellId = await getSpellUuidByIndex(spellIndex);
-
+export async function removeKnownSpell(characterId: string, spellId: string) {
   const { error } = await supabaseAdmin
     .from('character_known_spells')
     .delete()
@@ -70,22 +49,17 @@ export async function listKnownSpells(characterId: string) {
   if (ids.length === 0) return [];
 
   const { data: spells, error: e2 } = await supabaseAdmin
-    .from('spells')
-    .select('raw')
+    .from('spell_full')
+    .select('*')
     .in('id', ids)
     .order('name', { ascending: true });
 
   if (e2) sbThrow(e2, 'listKnownSpells.spells');
 
-  return (spells ?? []).map((r: any) => r.raw);
+  return spells ?? [];
 }
 
-export async function addPreparedSpell(
-  characterId: string,
-  spellIndex: string,
-) {
-  const spellId = await getSpellUuidByIndex(spellIndex);
-
+export async function addPreparedSpell(characterId: string, spellId: string) {
   const { data, error } = await supabaseAdmin
     .from('character_prepared_spells')
     .upsert(
@@ -102,15 +76,14 @@ export async function addPreparedSpell(
       prepared_at: new Date().toISOString(),
     };
   }
+
   return sbAssert(data, error, 'addPreparedSpell');
 }
 
 export async function removePreparedSpell(
   characterId: string,
-  spellIndex: string,
+  spellId: string,
 ) {
-  const spellId = await getSpellUuidByIndex(spellIndex);
-
   const { error } = await supabaseAdmin
     .from('character_prepared_spells')
     .delete()
@@ -133,12 +106,12 @@ export async function listPreparedSpells(characterId: string) {
   if (ids.length === 0) return [];
 
   const { data: spells, error: e2 } = await supabaseAdmin
-    .from('spells')
-    .select('raw')
+    .from('spell_full')
+    .select('*')
     .in('id', ids)
     .order('name', { ascending: true });
 
   if (e2) sbThrow(e2, 'listPreparedSpells.spells');
 
-  return (spells ?? []).map((r: any) => r.raw);
+  return spells ?? [];
 }

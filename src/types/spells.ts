@@ -1,54 +1,49 @@
 import { z } from 'zod';
 
-const NameUrlSchema = z.object({
-  index: z.string(),
-  name: z.string(),
-  url: z.string(),
-});
-
 export const SpellSchema = z.object({
-  index: z.string(),
+  id: z.string().uuid(),
+  idx: z.string(),
   name: z.string(),
   level: z.number(),
-  desc: z.array(z.string()),
-  higher_level: z.array(z.string()).optional(),
-  range: z.string(),
-  components: z.array(z.enum(['V', 'S', 'M'])),
-  material: z.string().optional(),
-  ritual: z.boolean(),
-  duration: z.string(),
-  concentration: z.boolean(),
+
   casting_time: z.string(),
-  attack_type: z.enum(['melee', 'ranged']).optional(),
-  school: NameUrlSchema,
-  classes: z.array(NameUrlSchema),
-  subclasses: z.array(NameUrlSchema).optional(),
-  area_of_effect: z
-    .object({
-      type: z.enum(['sphere', 'cube', 'cone', 'cylinder', 'line']),
-      size: z.number(),
-    })
-    .optional(),
-  dc: z
-    .object({
-      dc_type: NameUrlSchema.optional(),
-      dc_success: z.enum(['none', 'half', 'other']).optional(),
-      desc: z.string().optional(),
-    })
-    .optional(),
-  damage: z
-    .object({
-      damage_type: NameUrlSchema.optional(),
-      damage_at_slot_level: z.record(z.string(), z.string()).optional(),
-      damage_at_character_level: z.record(z.string(), z.string()).optional(),
-    })
-    .optional(),
-  heal_at_slot_level: z.record(z.string(), z.string()).optional(),
-  url: z.string(),
+  range: z.string(),
+  duration: z.string(),
+
+  concentration: z.boolean(),
+  ritual: z.boolean(),
+  attack_type: z.enum(['melee', 'ranged']).nullable(),
+
+  components: z.array(z.enum(['V', 'S', 'M'])),
+  material: z.string().nullable(),
+
+  school_id: z.number(),
+  school_idx: z.string().nullable(),
+  school_name: z.string().nullable(),
+
+  damage_type_id: z.number().nullable(),
+  damage_type_idx: z.string().nullable(),
+  damage_type_name: z.string().nullable(),
+
+  dc_type: z.enum(['str', 'dex', 'con', 'int', 'wis', 'cha']).nullable(),
+  dc_success: z.enum(['none', 'half', 'other']).nullable(),
+  dc_desc: z.string().nullable(),
+
+  aoe_type: z.enum(['sphere', 'cube', 'cone', 'cylinder', 'line']).nullable(),
+  aoe_size: z.number().nullable(),
+
+  description: z.array(z.string()),
+  higher_level: z.array(z.string()),
+
+  is_homebrew: z.boolean(),
+  created_at: z.string(),
+  updated_at: z.string(),
+
+  class_names: z.array(z.string()).nullable(),
+  subclass_names: z.array(z.string()).nullable(),
 });
 
 export const SpellListResponseSchema = z.object({
-  count: z.number(),
   results: z.array(SpellSchema),
 });
 
