@@ -93,3 +93,56 @@ export async function createCharacterForUser(
     updated_at: d.updated_at,
   } as CharacterRow;
 }
+
+export async function updateCharacterLevel(
+  id: string,
+  userId: string,
+  level: number,
+): Promise<CharacterRow> {
+  const { data: existing, error: existErr } = await supabaseAdmin
+    .from('characters')
+    .select('id, user_id')
+    .eq('id', id)
+    .single();
+
+  const row = sbAssert<{ id: string; user_id: string } | null>(
+    existing,
+    existErr,
+    'updateCharacterLevel:load',
+  );
+
+  if (!row) {
+    const err: any = new Error('Character not found');
+    err.statusCode = 404;
+    throw err;
+  }
+  if (row.user_id !== userId) {
+    const err: any = new Error('Not allowed');
+    err.statusCode = 403;
+    throw err;
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('characters')
+    .update({ level })
+    .eq('id', id)
+    .select(CHARACTER_SELECT)
+    .single();
+
+  const updated = sbAssert<CharacterWithJoins>(
+    data,
+    error,
+    'updateCharacterLevel:update',
+  );
+
+  return {
+    id: updated.id,
+    user_id: updated.user_id,
+    name: updated.name,
+    race: relationName(updated, 'character_races'),
+    class: relationName(updated, 'character_classes'),
+    level: updated.level,
+    created_at: updated.created_at,
+    updated_at: updated.updated_at,
+  };
+}

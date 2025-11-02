@@ -2,10 +2,12 @@ import { RequestHandler, Router } from 'express';
 import {
   createCharacterForUser,
   listCharactersByUser,
+  updateCharacterLevel,
 } from '../service/characterService.js';
 import {
   AssignKnownSpellSchema,
   CharacterCreationSchema,
+  CharacterLevelUpdateSchema,
 } from '../types/character.js';
 import {
   addKnownSpell,
@@ -124,6 +126,31 @@ export const characterRouter = () => {
     }
   };
 
+  const patchLevel: RequestHandler = async (req, res, next) => {
+    try {
+      const { id: characterId } = req.params;
+      const { level } = CharacterLevelUpdateSchema.parse(req.body);
+
+      const updated = await updateCharacterLevel(
+        characterId,
+        req.user.id,
+        level,
+      );
+      res.json(updated);
+      return;
+    } catch (e: any) {
+      if (e?.name === 'ZodError') {
+        res.status(400).json({ message: 'Invalid payload', issues: e.errors });
+        return;
+      }
+      if (e?.statusCode) {
+        res.status(e.statusCode).json({ message: e.message });
+        return;
+      }
+      next(e);
+    }
+  };
+
   router.get('/', list);
   router.post('/', create);
 
@@ -135,6 +162,8 @@ export const characterRouter = () => {
 
   router.post('/:id/prepared-spells', addPrepared);
   router.delete('/:id/prepared-spells/:spellId', removePrepared);
+
+  router.patch('/:id/level', patchLevel);
 
   return router;
 };

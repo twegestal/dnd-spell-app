@@ -1,3 +1,4 @@
+import { level } from 'winston';
 import { z } from 'zod';
 
 export type CharacterWithJoins = {
@@ -33,5 +34,10 @@ export const AssignKnownSpellSchema = z.object({
   spellId: z.string().min(1),
 });
 
+export const CharacterLevelUpdateSchema = z.object({
+  level: z.number().int().min(1).max(20),
+});
+
+export type CharacterLevelUpdate = z.infer<typeof CharacterLevelUpdateSchema>;
 export type AssignKnownSpell = z.infer<typeof AssignKnownSpellSchema>;
 export type CharacterCreation = z.infer<typeof CharacterCreationSchema>;
