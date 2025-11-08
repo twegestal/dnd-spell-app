@@ -8,6 +8,8 @@ import { healthRouter } from './routes/healthRouter.js';
 import { metaRouter } from './routes/metaRouter.js';
 import { characterRouter } from './routes/characterRouter.js';
 import { slotRouter } from './routes/slotRouter.js';
+import { sorceryPointsRouter } from './routes/sorceryPointsRouter.js';
+import { metamagicRouter } from './routes/metamagicRouter.js';
 
 export const createServer = () => {
   const app = express();
@@ -20,6 +22,8 @@ export const createServer = () => {
   app.use('/api/spells', validateToken, spellRouter());
   app.use('/api/characters', validateToken, characterRouter());
   app.use('/api/slots', validateToken, slotRouter());
+  app.use('/api', validateToken, sorceryPointsRouter());
+  app.use('/api', validateToken, metamagicRouter());
   app.use(errorHandler);
 
   return app;
