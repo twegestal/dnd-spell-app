@@ -45,3 +45,31 @@ export async function spendSorceryPoints(
     maximum: row?.maximum ?? null,
   };
 }
+
+export async function restoreSorceryPoints(
+  authHeader: string | undefined,
+  characterId: string,
+  qty: number,
+) {
+  if (!Number.isInteger(qty) || qty <= 0) {
+    throw new Error('qty must be a positive integer');
+  }
+
+  const sb = supabaseForRequest(authHeader);
+  const { data, error } = await sb.rpc('character_restore_sorcery_points', {
+    p_character: characterId,
+    p_qty: qty,
+  });
+
+  if (error) {
+    throw new Error(`restore_sorcery_points failed: ${error.message}`);
+  }
+
+  const row = Array.isArray(data) ? data[0] : data;
+  return {
+    characterId,
+    restored: qty,
+    remaining: row?.remaining ?? null,
+    maximum: row?.maximum ?? null,
+  };
+}
