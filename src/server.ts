@@ -17,13 +17,17 @@ export const createServer = () => {
   app.use(cors({ origin: '*' }));
   app.use(express.json());
   app.use(requestLogger);
+
   app.use('/health', healthRouter());
-  app.use('/api/meta', validateToken, metaRouter());
-  app.use('/api/spells', validateToken, spellRouter());
-  app.use('/api/characters', validateToken, characterRouter());
-  app.use('/api/slots', validateToken, slotRouter());
-  app.use('/api', validateToken, sorceryPointsRouter());
-  app.use('/api', validateToken, metamagicRouter());
+
+  app.use('/api', validateToken);
+  app.use('/api/meta', metaRouter());
+  app.use('/api/spells', spellRouter());
+  app.use('/api/characters', characterRouter());
+  app.use('/api/slots', slotRouter());
+  app.use('/api', sorceryPointsRouter());
+  app.use('/api', metamagicRouter());
+
   app.use(errorHandler);
 
   return app;
