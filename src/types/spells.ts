@@ -36,10 +36,13 @@ export const SpellSchema = z.object({
   higher_level: z.array(z.string()),
 
   is_homebrew: z.boolean(),
+  created_by: z.string().uuid().nullable(),
+  is_published: z.boolean(),
   created_at: z.string(),
   updated_at: z.string(),
 
   class_names: z.array(z.string()).nullable(),
+  class_ids: z.array(z.number()).nullable(),
   subclass_names: z.array(z.string()).nullable(),
 });
 
@@ -47,5 +50,38 @@ export const SpellListResponseSchema = z.object({
   results: z.array(SpellSchema),
 });
 
+export const CreateSpellSchema = z.object({
+  name: z.string().min(1),
+  level: z.number().int().min(0).max(9),
+  casting_time: z.string().min(1),
+  range: z.string().min(1),
+  duration: z.string().min(1),
+  concentration: z.boolean().default(false),
+  ritual: z.boolean().default(false),
+  attack_type: z.enum(['melee', 'ranged']).nullable().default(null),
+  components: z.array(z.enum(['V', 'S', 'M'])).default([]),
+  material: z.string().nullable().default(null),
+  school_id: z.number().int(),
+  damage_type_id: z.number().int().nullable().default(null),
+  dc_type: z
+    .enum(['str', 'dex', 'con', 'int', 'wis', 'cha'])
+    .nullable()
+    .default(null),
+  dc_success: z.enum(['none', 'half', 'other']).nullable().default(null),
+  dc_desc: z.string().nullable().default(null),
+  aoe_type: z
+    .enum(['sphere', 'cube', 'cone', 'cylinder', 'line'])
+    .nullable()
+    .default(null),
+  aoe_size: z.number().int().nullable().default(null),
+  description: z.array(z.string()).default([]),
+  higher_level: z.array(z.string()).default([]),
+  class_ids: z.array(z.number().int()).default([]),
+});
+
+export const UpdateSpellSchema = CreateSpellSchema.partial();
+
 export type Spell = z.infer<typeof SpellSchema>;
 export type SpellListResponse = z.infer<typeof SpellListResponseSchema>;
+export type CreateSpell = z.infer<typeof CreateSpellSchema>;
+export type UpdateSpell = z.infer<typeof UpdateSpellSchema>;

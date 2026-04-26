@@ -3,7 +3,12 @@ import { logger } from '../log/index.js';
 import { supabaseAdmin } from '../database/index.js';
 
 async function fetchMeta(
-  table: 'character_races' | 'character_classes',
+  table:
+    | 'character_races'
+    | 'character_classes'
+    | 'schools'
+    | 'damage_types'
+    | 'classes',
 ): Promise<MetaListResponse> {
   logger.info(`Fetching ${table} from database`);
   const { data, error } = await supabaseAdmin
@@ -21,10 +26,7 @@ async function fetchMeta(
     name: row.name as string,
   }));
 
-  return MetaListResponseSchema.parse({
-    count: results.length,
-    results,
-  });
+  return MetaListResponseSchema.parse({ count: results.length, results });
 }
 
 export async function fetchRaces(): Promise<MetaListResponse> {
@@ -33,4 +35,16 @@ export async function fetchRaces(): Promise<MetaListResponse> {
 
 export async function fetchClasses(): Promise<MetaListResponse> {
   return fetchMeta('character_classes');
+}
+
+export async function fetchSchools(): Promise<MetaListResponse> {
+  return fetchMeta('schools');
+}
+
+export async function fetchDamageTypes(): Promise<MetaListResponse> {
+  return fetchMeta('damage_types');
+}
+
+export async function fetchSpellClasses(): Promise<MetaListResponse> {
+  return fetchMeta('classes');
 }

@@ -1,5 +1,11 @@
 import { Router } from 'express';
-import { fetchClasses, fetchRaces } from '../service/metaService.js';
+import {
+  fetchClasses,
+  fetchRaces,
+  fetchSchools,
+  fetchDamageTypes,
+  fetchSpellClasses,
+} from '../service/metaService.js';
 
 export const metaRouter = () => {
   const router = Router();
@@ -16,6 +22,33 @@ export const metaRouter = () => {
   router.get('/classes', async (_req, res, next) => {
     try {
       const data = await fetchClasses();
+      res.status(200).json(data);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.get('/schools', async (_req, res, next) => {
+    try {
+      const data = await fetchSchools();
+      res.status(200).json(data);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.get('/damage-types', async (_req, res, next) => {
+    try {
+      const data = await fetchDamageTypes();
+      res.status(200).json(data);
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  router.get('/spell-classes', async (_req, res, next) => {
+    try {
+      const data = await fetchSpellClasses();
       res.status(200).json(data);
     } catch (e) {
       next(e);
