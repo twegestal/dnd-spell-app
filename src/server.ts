@@ -11,6 +11,7 @@ import { slotRouter } from './routes/slotRouter.js';
 import { sorceryPointsRouter } from './routes/sorceryPointsRouter.js';
 import { metamagicRouter } from './routes/metamagicRouter.js';
 import { invocationsRouter } from './routes/invocationsRouter.js';
+import { resourcesRouter } from './routes/resourcesRouter.js';
 
 export const createServer = () => {
   const app = express();
@@ -29,6 +30,7 @@ export const createServer = () => {
   app.use('/api', sorceryPointsRouter());
   app.use('/api', metamagicRouter());
   app.use('/api', invocationsRouter());
+  app.use('/api', resourcesRouter());
 
   app.use(errorHandler);
 
