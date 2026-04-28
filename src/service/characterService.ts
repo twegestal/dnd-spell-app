@@ -19,7 +19,7 @@ const CHARACTER_SELECT = `
   created_at,
   updated_at,
   character_races ( name ),
-  character_classes ( name )
+  character_classes!characters_class_id_fkey ( name )
 `;
 
 export async function listCharactersByUser(
