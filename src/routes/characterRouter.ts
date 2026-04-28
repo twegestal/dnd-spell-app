@@ -1,13 +1,18 @@
 import { RequestHandler, Router } from 'express';
 import {
+  addCharacterClass,
   createCharacterForUser,
   listCharactersByUser,
+  removeCharacterClass,
+  updateCharacterClassLevel,
   updateCharacterLevel,
 } from '../service/characterService.js';
 import {
+  AddCharacterClassSchema,
   AssignKnownSpellSchema,
   CharacterCreationSchema,
   CharacterLevelUpdateSchema,
+  UpdateCharacterClassSchema,
 } from '../types/character.js';
 import {
   addKnownSpell,
@@ -164,6 +169,66 @@ export const characterRouter = () => {
   router.delete('/:id/prepared-spells/:spellId', removePrepared);
 
   router.patch('/:id/level', patchLevel);
+
+  router.post('/:id/classes', async (req, res, next) => {
+    try {
+      const dto = AddCharacterClassSchema.parse(req.body);
+      const result = await addCharacterClass(req.params.id, req.user.id, dto);
+      res.status(201).json(result);
+    } catch (e: any) {
+      if (e?.name === 'ZodError') {
+        res.status(400).json({ message: 'Invalid payload', issues: e.errors });
+        return;
+      }
+      if (e?.statusCode) {
+        res.status(e.statusCode).json({ message: e.message });
+        return;
+      }
+      next(e);
+    }
+  });
+
+  router.patch('/:id/classes/:classId', async (req, res, next) => {
+    try {
+      const classId = parseInt(req.params.classId);
+      const { level } = UpdateCharacterClassSchema.parse(req.body);
+      const result = await updateCharacterClassLevel(
+        req.params.id,
+        req.user.id,
+        classId,
+        level,
+      );
+      res.json(result);
+    } catch (e: any) {
+      if (e?.name === 'ZodError') {
+        res.status(400).json({ message: 'Invalid payload', issues: e.errors });
+        return;
+      }
+      if (e?.statusCode) {
+        res.status(e.statusCode).json({ message: e.message });
+        return;
+      }
+      next(e);
+    }
+  });
+
+  router.delete('/:id/classes/:classId', async (req, res, next) => {
+    try {
+      const classId = parseInt(req.params.classId);
+      const result = await removeCharacterClass(
+        req.params.id,
+        req.user.id,
+        classId,
+      );
+      res.json(result);
+    } catch (e: any) {
+      if (e?.statusCode) {
+        res.status(e.statusCode).json({ message: e.message });
+        return;
+      }
+      next(e);
+    }
+  });
 
   return router;
 };

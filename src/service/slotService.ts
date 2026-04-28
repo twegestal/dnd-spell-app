@@ -58,16 +58,6 @@ export async function getRemainingSlots(
   if (pactErr)
     throw new Error(`getRemainingSlots pact failed: ${pactErr.message}`);
 
-  if (pactRows && pactRows.length) {
-    const row = pactRows[0];
-    return {
-      type: 'pact' as const,
-      slotLevel: row.slot_level as number,
-      remaining: row.remaining as number,
-      maximum: row.maximum as number,
-    };
-  }
-
   const { data: prepRows, error: prepErr } = await sb
     .from('v_character_slots_remaining')
     .select('slot_level, remaining, maximum')
@@ -77,11 +67,37 @@ export async function getRemainingSlots(
   if (prepErr)
     throw new Error(`getRemainingSlots prepared failed: ${prepErr.message}`);
 
+  const hasPact = pactRows && pactRows.length > 0;
+  const hasRegular = prepRows && prepRows.length > 0;
+
   const levels: PreparedLevel[] = (prepRows ?? []).map((r) => ({
     slotLevel: r.slot_level as number,
     remaining: r.remaining as number,
     maximum: r.maximum as number,
   }));
+
+  if (hasPact && hasRegular) {
+    const pact = pactRows[0];
+    return {
+      type: 'multiclass' as const,
+      pact: {
+        slotLevel: pact.slot_level as number,
+        remaining: pact.remaining as number,
+        maximum: pact.maximum as number,
+      },
+      levels,
+    };
+  }
+
+  if (hasPact) {
+    const row = pactRows[0];
+    return {
+      type: 'pact' as const,
+      slotLevel: row.slot_level as number,
+      remaining: row.remaining as number,
+      maximum: row.maximum as number,
+    };
+  }
 
   return { type: 'prepared' as const, levels };
 }
