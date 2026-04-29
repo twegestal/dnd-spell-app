@@ -2,8 +2,11 @@ import { RequestHandler, Router } from 'express';
 import {
   addCharacterClass,
   createCharacterForUser,
+  listAllCharactersByUser,
   listCharactersByUser,
   removeCharacterClass,
+  restoreCharacter,
+  retireCharacter,
   updateCharacterClassLevel,
   updateCharacterLevel,
 } from '../service/characterService.js';
@@ -158,6 +161,14 @@ export const characterRouter = () => {
 
   router.get('/', list);
   router.post('/', create);
+  router.get('/all', async (req, res, next) => {
+    try {
+      const results = await listAllCharactersByUser(req.user.id);
+      res.json({ results });
+    } catch (e) {
+      next(e);
+    }
+  });
 
   router.get('/:id/known-spells', listKnown);
   router.get('/:id/prepared-spells', listPrepared);
@@ -220,6 +231,32 @@ export const characterRouter = () => {
         req.user.id,
         classId,
       );
+      res.json(result);
+    } catch (e: any) {
+      if (e?.statusCode) {
+        res.status(e.statusCode).json({ message: e.message });
+        return;
+      }
+      next(e);
+    }
+  });
+
+  router.patch('/:id/retire', async (req, res, next) => {
+    try {
+      const result = await retireCharacter(req.params.id, req.user.id);
+      res.json(result);
+    } catch (e: any) {
+      if (e?.statusCode) {
+        res.status(e.statusCode).json({ message: e.message });
+        return;
+      }
+      next(e);
+    }
+  });
+
+  router.patch('/:id/restore', async (req, res, next) => {
+    try {
+      const result = await restoreCharacter(req.params.id, req.user.id);
       res.json(result);
     } catch (e: any) {
       if (e?.statusCode) {

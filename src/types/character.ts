@@ -27,6 +27,7 @@ export type CharacterRow = {
   class: string;
   classes: CharacterClass[];
   level: number;
+  is_retired: boolean;
   created_at: string;
   updated_at: string;
 };

@@ -16,6 +16,7 @@ const CHARACTER_SELECT = `
   user_id,
   name,
   level,
+  is_retired,
   created_at,
   updated_at,
   character_races ( name ),
@@ -50,6 +51,7 @@ function mapCharacterRow(r: any): CharacterRow {
     class: primaryClass,
     classes: resolvedClasses,
     level: r.level,
+    is_retired: r.is_retired,
     created_at: r.created_at,
     updated_at: r.updated_at,
   };
@@ -62,9 +64,100 @@ export async function listCharactersByUser(
     .from('characters')
     .select(CHARACTER_SELECT)
     .eq('user_id', userId)
+    .eq('is_retired', false)
     .order('created_at', { ascending: false });
 
   const rows = sbAssert<any[]>(data, error, 'listCharactersByUser');
+  return rows.map(mapCharacterRow);
+}
+
+export async function retireCharacter(
+  id: string,
+  userId: string,
+): Promise<CharacterRow> {
+  const { data: existing, error: existErr } = await supabaseAdmin
+    .from('characters')
+    .select('id, user_id')
+    .eq('id', id)
+    .single();
+
+  const row = sbAssert<{ id: string; user_id: string } | null>(
+    existing,
+    existErr,
+    'retireCharacter:load',
+  );
+
+  if (!row) {
+    const err: any = new Error('Character not found');
+    err.statusCode = 404;
+    throw err;
+  }
+  if (row.user_id !== userId) {
+    const err: any = new Error('Not allowed');
+    err.statusCode = 403;
+    throw err;
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('characters')
+    .update({ is_retired: true })
+    .eq('id', id)
+    .select(CHARACTER_SELECT)
+    .single();
+
+  const updated = sbAssert<any>(data, error, 'retireCharacter:update');
+  return mapCharacterRow(updated);
+}
+
+export async function restoreCharacter(
+  id: string,
+  userId: string,
+): Promise<CharacterRow> {
+  const { data: existing, error: existErr } = await supabaseAdmin
+    .from('characters')
+    .select('id, user_id')
+    .eq('id', id)
+    .single();
+
+  const row = sbAssert<{ id: string; user_id: string } | null>(
+    existing,
+    existErr,
+    'restoreCharacter:load',
+  );
+
+  if (!row) {
+    const err: any = new Error('Character not found');
+    err.statusCode = 404;
+    throw err;
+  }
+  if (row.user_id !== userId) {
+    const err: any = new Error('Not allowed');
+    err.statusCode = 403;
+    throw err;
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('characters')
+    .update({ is_retired: false })
+    .eq('id', id)
+    .select(CHARACTER_SELECT)
+    .single();
+
+  const updated = sbAssert<any>(data, error, 'restoreCharacter:update');
+  return mapCharacterRow(updated);
+}
+
+export async function listAllCharactersByUser(
+  userId: string,
+): Promise<CharacterRow[]> {
+  const { data, error } = await supabaseAdmin
+    .from('characters')
+    .select(CHARACTER_SELECT)
+    .eq('user_id', userId)
+    .order('is_retired', { ascending: true })
+    .order('created_at', { ascending: false });
+
+  const rows = sbAssert<any[]>(data, error, 'listAllCharactersByUser');
   return rows.map(mapCharacterRow);
 }
 
