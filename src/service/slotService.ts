@@ -7,6 +7,7 @@ export type ToggleSlotArgs = {
   slotIndex: number;
   spellId?: string | null;
   note?: string | null;
+  isPact?: boolean;
 };
 
 export async function toggleSlot(
@@ -17,9 +18,10 @@ export async function toggleSlot(
     slotIndex,
     spellId = null,
     note = null,
+    isPact = false,
   }: ToggleSlotArgs,
 ) {
-  const sb: SupabaseClient = supabaseForRequest(authHeader);
+  const sb = supabaseForRequest(authHeader);
 
   const { data, error } = await sb.rpc('toggle_slot', {
     p_character: characterId,
@@ -27,11 +29,10 @@ export async function toggleSlot(
     p_slot_index: slotIndex,
     p_spell_id: spellId,
     p_note: note,
+    p_is_pact: isPact,
   });
 
-  if (error) {
-    throw new Error(`toggle_slot failed: ${error.message}`);
-  }
+  if (error) throw new Error(`toggle_slot failed: ${error.message}`);
 
   const spent = Array.isArray(data) && data.length ? !!data[0].spent : null;
   return { characterId, slotLevel, slotIndex, spent };

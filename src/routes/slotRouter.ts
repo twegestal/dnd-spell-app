@@ -12,7 +12,7 @@ export const slotRouter = () => {
   const toggle: RequestHandler = async (req, res, next) => {
     try {
       const { id: characterId } = req.params;
-      const { slotLevel, slotIndex, spellId, note } = req.body ?? {};
+      const { slotLevel, slotIndex, spellId, note, isPact } = req.body ?? {};
       if (!slotLevel || !slotIndex) {
         res
           .status(400)
@@ -26,6 +26,7 @@ export const slotRouter = () => {
         slotIndex: Number(slotIndex),
         spellId: spellId ?? null,
         note: note ?? null,
+        isPact: isPact ?? false,
       });
 
       res.json(result);
